@@ -2,50 +2,12 @@ import 'dart:html';
 import 'dart:js';
 import 'dart:math';
 import 'package:game_loop/game_loop_html.dart';
-class Array2d<T> {
-  List<List<T>> array;
-  T defaultValue = null;
-  
-  Array2d(int width, int height, {T this.defaultValue}) {
-    array = new List<List<T>>();
-    this.width = width;
-    this.height = height;
-  }
-  
-  operator [](int x) => array[x];
-  
-  void set width(int v) {
-    while (array.length > v)
-      array.removeLast();
-    while (array.length < v) {
-      List<T> newList = new List<T>();
-      if (array.length > 0) {
-        for (int y = 0; y < array.first.length; y++)
-          newList.add(defaultValue);
-      }
-      array.add(newList);
-    }
-  }
-  
-  void set height(int v) {
-    while (array.first.length > v) {
-      for (int x = 0; x < array.length; x++)
-        array[x].removeLast();
-    }
-    while (array.first.length < v) {
-      for (int x = 0; x < array.length; x++)
-        array[x].add(defaultValue);
-    }
-  }
-}
+import '2darray.dart';
 
-
-final CanvasRenderingContext2D context =
-  (querySelector("#canvas") as CanvasElement).context2D;
+final CanvasRenderingContext2D context = (querySelector("#canvas") as CanvasElement).context2D;
 final CanvasElement canvas = querySelector("#canvas");
 final int TILE_SIZE = 32;
 Array2d map = new Array2d<int>(25,25);
-
 int mouse_x=0;
 int mouse_y=0;
 
@@ -55,16 +17,13 @@ void main() {
       map[i][j] = 0;
     }
   }
-  
+
   Random generator = new Random();
-  //for(int i=0;i<10;i++){
-    //int q = generator.nextInt(24);
-    //int j = generator.nextInt(24);
-    map[3][4] = 2;
-    map[3][5] = 2;
-    map[4][4] = 2;
-    map[4][5] = 2;
-  //}
+  for(int i=0;i<10;i++){
+    int q = generator.nextInt(24);
+    int j = generator.nextInt(24);
+    map[q][j] = 2;
+  }
 
   GameLoopHtml gameLoop = new GameLoopHtml(canvas);
   gameLoop.onUpdate = ((gameLoop) {
@@ -76,15 +35,13 @@ void main() {
         }
       }
     }
+
     context.canvas.onMouseMove.listen((e) {
       mouse_x = (e.offset.x/TILE_SIZE).floor();
       mouse_y = (e.offset.y/TILE_SIZE).floor();
       plot(mouse_x,mouse_y);
-      
     });
-    context.canvas.onClick.listen((e) {
-    });
-    
+
     for(int i=0;i<=360;i++){
       var rad = i*PI/360;
       var dx = cos(i);
@@ -92,11 +49,14 @@ void main() {
       Fov(dx,dy);
     }
   });
+
   gameLoop.onRender = ((gameLoop) {
     draw(mouse_x,mouse_y);
   });
+
   gameLoop.start();
 }
+
 void plot(x,y){
   if(x>=0&&x<25&&y>=0&&y<25&&map[x][y]!=2){
     map[x][y] = 1;
