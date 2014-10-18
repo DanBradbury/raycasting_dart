@@ -1,0 +1,9 @@
+name: helloDart
+description: A sample web application
+dependencies:
+  browser: any
+  game_loop: any
+  math: any
+  utils: any
+dev_dependencies:
+  js: any
